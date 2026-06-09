@@ -1,14 +1,30 @@
 import React, { useState } from 'react'
 import assets from '../assets/assets'
 import {useNavigate} from "react-router-dom"
+import { useContext } from 'react'
+import { Authcntext } from '../../context/authcontext'
 const Profilepage = () => {
+  const {authUser,updateProfle}=useContext(Authcntext);
   const[selectedimage,setselectedimg]=useState(null);
   const navigate=useNavigate();
-  const [name,setname]=useState("Martin Johnson");
-  const[bio,setbio]=useState("Hi Everyone I am Using A Talk-App")
+  const [name,setname]=useState(authUser.fullname);
+  const[bio,setbio]=useState(authUser.bio);
   const handleSubmit=async(e)=>{
     e.preventDefault();
-    navigate('/');
+    if(!selectedimage){
+      await updateProfle({fullname:name,bio});
+      navigate('/');
+      return ;
+
+    }
+    const render=new FileReader();
+    render.readAsDataURL(selectedimage);
+    render.onload=async ()=>{
+      const base64image=render.result;
+      await updateProfle({profilepic:base64image,fullname:name,bio});
+      navigate('/');
+    }
+    
 
   }
   return (
